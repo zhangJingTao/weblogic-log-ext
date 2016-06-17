@@ -1,0 +1,40 @@
+apply plugin : 'java'
+version='1.0.0'
+sourceCompatibility = 1.6
+archivesBaseName="weblogic-log-ext"
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+repositories {
+    mavenCentral()
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs=['src/java']
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir:'lib',include:'*.jar')
+}
+
+//依赖编译，然后打包JAR
+task taskJar(type:Jar, dependsOn: compileJava) {
+    from 'build/classes'
+    destinationDir = file('build/libs')
+}
+
+//清除上次的编译过的文件
+task clearPj(type:Delete){
+    delete 'build','target'
+}
+
+
+//把JAR复制到目标目录
+task release(type: Copy,dependsOn: [clearPj,taskJar]) {
+    from('build/libs') {
+        include '*.jar'
+    }
+    into ('target')
+}
